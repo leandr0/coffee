@@ -1,0 +1,133 @@
+{
+    "_links": {
+        ...
+        "fx:customers": {
+            "href": "https://api.foxycart.com/stores/41000/customers",
+            "title": "Customers for This Store"
+        },
+        "fx:transactions": {
+            "href": "https://api.foxycart.com/stores/41000/transactions",
+            "title": "Transactions for This Store"
+        },
+        "fx:subscriptions": {
+            "href": "https://api.foxycart.com/stores/41000/subscriptions",
+            "title": "Subscriptions for This Store"
+        },
+        ...
+    },
+    ...
+}
+
+{"data":
+{"text":"Anonymous users does not have storage.objects.get access to google-code-archive/v2/code.google.com/huddle-apis/wiki/BasicConcepts.wiki."},
+"status":401,
+"config":
+{"method":"GET","transformRequest":[null],"jsonpCallbackParam":
+"callback","url":"https://www.googleapis.com/storage/v1/b/google-code-archive/o/v2%2Fcode.google.com%2Fhuddle-apis%2Fwiki%2FBasicConcepts.wiki?alt=media",
+"headers":
+{"Accept":"application/json, text/plain, */*"}}
+,"statusText":"Unauthorized"}
+
+
+{  
+  "links": [{
+    "href": "https://api.paypal.com/v1/payments/sale/36C38912MN9658832",
+    "rel": "self",
+    "method": "GET"
+  }, {
+    "href": "https://api.paypal.com/v1/payments/sale/36C38912MN9658832/refund",
+    "rel": "refund",
+    "method": "POST"
+  }, {
+    "href": "https://api.paypal.com/v1/payments/payment/PAY-5YK922393D847794YKER7MUI",
+    "rel": "parent_payment",
+    "method": "GET"
+  }]
+}
+
+"links": {
+        "up": {
+            "url": "https://vrapi.verticalresponse.com/api/v1/contacts"
+        },
+        "lists": {
+            "url": "https://vrapi.verticalresponse.com/api/v1/contacts/1099513934863/lists"
+        },
+        "messages": {
+            "url": "https://vrapi.verticalresponse.com/api/v1/contacts/1099513934863/messages"
+        },
+        "stats": {
+            "url": "https://vrapi.verticalresponse.com/api/v1/contacts/1099513934863/stats"
+        }        
+}
+
+
+{
+  "createdDate": "2016-06-01T18:53:41Z",
+  "description": "A sample API created programmatically by calling API Gateway control service using the REST API",
+  "id": "fugvjdxtri",
+  "name": "my-test-api",
+  "_links": {
+    "self": {
+      "href": "/restapis/fugvjdxtri"
+    },
+    "authorizer:by-id": {
+      "href": "/restapis/fugvjdxtri/authorizers/{authorizer_id}",
+      "templated": true
+    },
+    "authorizer:create": {
+      "href": "/restapis/fugvjdxtri/authorizers"
+    },
+    "deployment:by-id": {
+      "href": "/restapis/fugvjdxtri/deployments/{deployment_id}{?embed}",
+      "templated": true
+    },
+    "deployment:create": {
+      "href": "/restapis/fugvjdxtri/deployments"
+    },
+    "model:by-name": {
+      "href": "/restapis/fugvjdxtri/models/{model_name}?flatten=false",
+      "templated": true
+    },
+    "model:create": {
+      "href": "/restapis/fugvjdxtri/models"
+    },
+    "resource:by-id": {
+      "href": "/restapis/fugvjdxtri/resources/{resource_id}{?embed}",
+      "templated": true
+    },
+    "resource:create": {
+      "href": "/restapis/fugvjdxtri/resources/3kzxbg5sa2"
+    },
+    "restapi:authorizers": {
+      "href": "/restapis/fugvjdxtri/authorizers"
+    },
+    "restapi:delete": {
+      "href": "/restapis/fugvjdxtri"
+    },
+    "restapi:deployments": {
+      "href": "/restapis/fugvjdxtri/deployments{?limit}",
+      "templated": true
+    },
+    "restapi:models": {
+      "href": "/restapis/fugvjdxtri/models"
+    },
+    "restapi:resources": {
+      "href": "/restapis/fugvjdxtri/resources{?limit,embed}",
+      "templated": true
+    },
+    "restapi:stages": {
+      "href": "/restapis/fugvjdxtri/stages{?deployment_id}",
+      "templated": true
+    },
+    "restapi:update": {
+      "href": "/restapis/fugvjdxtri"
+    },
+    "stage:by-name": {
+      "href": "/restapis/fugvjdxtri/stages/{stage_name}",
+      "templated": true
+    },
+    "stage:create": {
+      "href": "/restapis/fugvjdxtri/stages"
+    }
+  }
+}

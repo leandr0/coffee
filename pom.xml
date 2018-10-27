@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.lrgoncalves.microservices</groupId>
+	<artifactId>coffee</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>coffee</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+	</properties>
+
+
+	<dependencyManagement>
+		<dependencies>
+
+			<dependency>
+				<groupId>org.glassfish.jersey.containers</groupId>
+				<artifactId>jersey-container-jdk-http</artifactId>
+				<version>2.25.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.glassfish.jersey.core</groupId>
+				<artifactId>jersey-server</artifactId>
+				<version>2.25.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.glassfish.jersey.containers</groupId>
+				<artifactId>jersey-container-servlet-core</artifactId>
+				<version>2.25.1</version>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/org.glassfish.jersey.core/jersey-common -->
+			<dependency>
+				<groupId>org.glassfish.jersey.core</groupId>
+				<artifactId>jersey-common</artifactId>
+				<version>2.25.1</version>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/javax.ws.rs/javax.ws.rs-api -->
+			<dependency>
+				<groupId>javax.ws.rs</groupId>
+				<artifactId>javax.ws.rs-api</artifactId>
+				<version>2.1</version>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/org.lightcouch/lightcouch -->
+			<dependency>
+				<groupId>org.lightcouch</groupId>
+				<artifactId>lightcouch</artifactId>
+				<version>0.2.0</version>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>2.6</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>2.9.3</version>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/com.mashape.unirest/unirest-java -->
+			<dependency>
+				<groupId>com.mashape.unirest</groupId>
+				<artifactId>unirest-java</artifactId>
+				<version>1.4.9</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.neo4j</groupId>
+				<artifactId>neo4j-ogm-core</artifactId>
+				<version>3.0.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.neo4j</groupId>
+				<artifactId>neo4j-ogm-bolt-driver</artifactId>
+				<version>3.0.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.datanucleus</groupId>
+				<artifactId>datanucleus-core</artifactId>
+				<version>5.1.5</version>
+			</dependency>
+
+			<dependency>
+				<groupId>joda-time</groupId>
+				<artifactId>joda-time</artifactId>
+				<version>2.9.9</version>
+			</dependency>
+
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.12</version>
+				<scope>test</scope>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
+
+	<modules>
+		<module>coffee.order</module>
+		<module>coffee.model</module>
+		<module>coffee.payment</module>
+		<module>coffee.dap</module>
+	</modules>
+
+</project>
