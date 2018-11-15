@@ -5,13 +5,13 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
+import static javax.ws.rs.core.MediaType.*;
 import javax.ws.rs.core.Response;
+import static javax.ws.rs.core.Response.Status.*;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
@@ -22,9 +22,11 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lrgoncalves.coffee.model.Order;
 import com.lrgoncalves.coffee.model.OrderStatus;
-import com.lrgoncalves.coffee.model.hateos.HATEOS;
 import com.lrgoncalves.coffee.model.hateos.OrderHATEOS;
-import com.lrgoncalves.coffee.model.type.OrderStatusType;
+import static com.lrgoncalves.coffee.model.mongodb.trace.OrderBusinessOperationType.*;
+import static com.lrgoncalves.coffee.model.mongodb.trace.OrderTrace.*;
+import static com.lrgoncalves.coffee.model.mongodb.trace.TraceType.*;
+import static com.lrgoncalves.coffee.model.type.OrderStatusType.*;
 
 @Path("/order")
 public class OrderService {
@@ -43,32 +45,35 @@ public class OrderService {
 	 * 
 	 */
 	private static ObjectMapper mapper = new ObjectMapper();
-    
+
 	/**
 	 * 
 	 */
 	private static OrderHATEOS hateos = new OrderHATEOS();
-	
+
+
 	@GET
 	@Path("/{UUDI}")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response getOrder(@PathParam(value="UUDI") String uudi, final String orderRequestJson) {
-
-		if(orderRequestJson != null && StringUtils.isNotEmpty(orderRequestJson)) {
-			LOG.info("payload >>>>  "+ orderRequestJson );
-			System.out.println("payload >>>>  "+ orderRequestJson);
-			
-			return null;
-		}
-		
-		
-		LOG.info("Receiving Order Request Payload in method getOrder");
-		LOG.debug(uudi);
-
-		Order order = new Order();
+	@Produces(APPLICATION_JSON)
+	@Consumes(APPLICATION_JSON)
+	public Response getOrder(@PathParam(value="UUDI") String uudi) {
 
 		try {
+
+			
+			String pathParam = "{ \"path_parameters\" :  [ { \"UUDI\" : \""+uudi+"\" }] }";
+			
+			storePayloadAsync(REQUEST, FIND_ORDER , pathParam);
+
+			if(uudi == null && StringUtils.isEmpty(uudi)) {
+				LOG.debug("UUDI request is null or empty.");
+				throw new IllegalArgumentException("Bad Request");
+			}
+
+			LOG.info("Receiving Order Request Payload in method getOrder");
+			LOG.debug(uudi);
+
+			Order order = new Order();
 
 			LOG.info("Fiding order request");
 			order = order.findByUUDI(uudi);
@@ -76,20 +81,42 @@ public class OrderService {
 			LOG.info("Generating HATEOS");
 			String result = hateos.generateHATEOS(order,uriInfo.getBaseUri());
 			LOG.debug(result);
-	        
-			LOG.info("Returning HTTP Status "+Status.OK);
-			return Response.status(Status.OK).entity(result).build();
 
-		} catch (Throwable t) {
+			storePayloadAsync(RESPONSE, FIND_ORDER , result);
+			
+			LOG.info("Returning HTTP Status "+ OK);
+			return Response.status(OK).entity(result).build();
+
+		}catch (IllegalArgumentException i) {
+			
+			LOG.error(i.getMessage());
+			
+			try {				
+				storePayloadAsync(RESPONSE_ERROR,FIND_ORDER,buildErrorResponse(Status.NOT_FOUND));
+			} catch (InterruptedException e) {
+				LOG.error(e.getMessage());
+			}
+			
+			return Response.status(NOT_FOUND).entity(i.getMessage()).build();
+		} 
+		catch (Throwable t) {
+			
 			LOG.error(t.getMessage());
-			return Response.serverError().build();
+			
+			try {				
+				storePayloadAsync(RESPONSE_ERROR,FIND_ORDER,buildErrorResponse(INTERNAL_SERVER_ERROR));
+			} catch (InterruptedException e) {
+				LOG.error(e.getMessage());
+			}
+			
+			return Response.serverError().entity(t.getMessage()).build();
 		}
 	}
 
 
 	@POST
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(APPLICATION_JSON)
+	@Consumes(APPLICATION_JSON)
 	public Response createOrder(final String orderRequestJson) {
 
 		LOG.info("Receiving Order Request Payload in method createOrder");
@@ -99,11 +126,13 @@ public class OrderService {
 
 		try {
 
+			storePayloadAsync(REQUEST, CREATE_ORDER ,orderRequestJson);
+
 			if(StringUtils.isBlank(orderRequestJson)) {
 				LOG.debug("Payload request is null or empty.");
 				throw new IllegalArgumentException("Bad Request");
 			}
-			
+
 			LOG.info("Converting JSON Payload to Object");
 			order = mapper.readValue(orderRequestJson, Order.class);
 
@@ -114,23 +143,42 @@ public class OrderService {
 			String result = hateos.generateHATEOS(order,uriInfo.getBaseUri());
 			LOG.debug(result);
 
-			LOG.info("Returning HTTP Status "+Status.CREATED);
-			return Response.status(Status.CREATED).entity(result).build();
+			storePayloadAsync(RESPONSE, CREATE_ORDER ,result);
+
+			LOG.info("Returning HTTP Status "+ CREATED);
+			return Response.status(CREATED).entity(result).build();
 
 		}catch (IllegalArgumentException i) {
+			
 			LOG.error(i.getMessage());
-			return Response.status(Status.BAD_REQUEST).build();
+
+			Response response = Response.status(BAD_REQUEST).build();
+			try {				
+				storePayloadAsync(RESPONSE_ERROR,CREATE_ORDER,buildErrorResponse(BAD_REQUEST));
+			} catch (InterruptedException e) {
+				LOG.error(e.getMessage());
+			}
+			return response;
 		} 
 		catch (Throwable t) {
+			
 			LOG.error(t.getMessage());
-			return Response.serverError().build();
+
+			Response response = Response.status(INTERNAL_SERVER_ERROR).build();
+			try {
+				storePayloadAsync(RESPONSE_ERROR,CREATE_ORDER,buildErrorResponse(INTERNAL_SERVER_ERROR));
+			} catch (InterruptedException e) {
+				LOG.error(e.getMessage());
+			}
+
+			return response;
 		}
 	}
 
 	@DELETE
 	@Path("/{UUDI}")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(APPLICATION_JSON)
+	@Consumes(APPLICATION_JSON)
 	public Response cancelOrder(final @PathParam(value="UUDI") String uudi ) {
 
 		LOG.info("Receiving Order Request Payload in method deleteOrder");
@@ -141,27 +189,28 @@ public class OrderService {
 
 			LOG.info("Fiding order request");
 			order = order.findByUUDI(uudi);
-			
+
 			if(order == null) {
 				LOG.info("Returning HTTP Status 404");
-				return Response.status(Status.NOT_FOUND).entity("{\"messsage\": \"Resource Not Found.\" }").build();
+				return Response.status(NOT_FOUND).entity("{\"messsage\": \"Resource Not Found.\" }").build();
 			}
 
-			if(order.getStatus().getType() == OrderStatusType.UNPAID) {
+			if(order.getStatus().getType() == UNPAID) {
 
 				OrderStatus status = order.getStatus();
-				
-				status.setType(OrderStatusType.CANCELLED);
+
+				status.setType(CANCELLED);
 				LOG.info("Updating Status to CANCELLED");
 				order.setStatus(status.save(status));
-				
+
 				LOG.info("Generating HATEOS");
 				String result = hateos.generateHATEOS(order,uriInfo.getBaseUri());
 				LOG.debug(result);
 
-				LOG.info("Returning HTTP Status "+Status.OK);
-				return Response.status(Status.OK).entity(result).build();
+				LOG.info("Returning HTTP Status "+ OK);
+				return Response.status(OK).entity(result).build();
 
+				
 			}else {
 
 				LOG.info("Generating HATEOS");
@@ -169,7 +218,7 @@ public class OrderService {
 				LOG.debug(result);
 
 				LOG.info("Returning HTTP Status 403");
-				return Response.status(Status.FORBIDDEN).entity(result).build();
+				return Response.status(FORBIDDEN).entity(result).build();
 			}
 
 		} catch (Throwable t) {
@@ -177,7 +226,7 @@ public class OrderService {
 			return Response.serverError().build();
 		}
 	}
-	
+
 	/**
 	 * Just the location could be updated
 	 * @param uudi
@@ -185,10 +234,10 @@ public class OrderService {
 	 */
 	@PATCH
 	@Path("/{UUDI}")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(APPLICATION_JSON)
+	@Consumes(APPLICATION_JSON)
 	public Response updateOrder(final @PathParam(value="UUDI") String uudi ) {
-		
+
 		LOG.info("Receiving Order Request Payload in method updateOrder");
 
 		Order order = new Order();
@@ -198,15 +247,15 @@ public class OrderService {
 			LOG.info("Saving order request");
 			order = order.findByUUDI(uudi);
 
-			if(order.getStatus().getType() == OrderStatusType.UNPAID) {
+			if(order.getStatus().getType() == UNPAID) {
 
-				
+
 				LOG.info("Generating HATEOS");
 				//final String HATEOS = OrderHATEOS.generateHATEOS(order,uriInfo.getBaseUri()).toJson();
 				//LOG.debug(HATEOS);
 
-				LOG.info("Returning HTTP Status "+Status.OK);
-				return Response.status(Status.OK).entity("").build();
+				LOG.info("Returning HTTP Status "+ OK);
+				return Response.status(OK).entity("").build();
 
 			}else {
 
@@ -214,8 +263,8 @@ public class OrderService {
 				//final String HATEOS = OrderHATEOS.generateHATEOS(order,uriInfo.getBaseUri()).toJson();
 				//LOG.debug(HATEOS);
 
-				LOG.info("Returning HTTP Status"+Status.NOT_ACCEPTABLE);
-				return Response.status(Status.NOT_ACCEPTABLE).entity("{\"messsage\": \"Invalid Status\" }").build();
+				LOG.info("Returning HTTP Status"+ NOT_ACCEPTABLE);
+				return Response.status(NOT_ACCEPTABLE).entity("{\"messsage\": \"Invalid Status\" }").build();
 			}
 
 		} catch (Throwable t) {
@@ -223,4 +272,8 @@ public class OrderService {
 			return Response.serverError().build();
 		}
 	}	
+
+	private String buildErrorResponse(final Status httpStatus) {
+		return "{\"Status Code\" : \""+httpStatus.getStatusCode()+" "+httpStatus.getReasonPhrase()+"\"}";
+	}
 }

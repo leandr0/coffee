@@ -1,5 +1,6 @@
 package com.lrgoncalves.coffee.model;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,9 +16,15 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lrgoncalves.coffee.model.mongodb.trace.BusinessOperationType;
+import com.lrgoncalves.coffee.model.mongodb.trace.TraceType;
 import com.lrgoncalves.coffee.model.neo4j.Neo4jSessionFactory;
 import com.lrgoncalves.coffee.model.type.LocationType;
 import com.lrgoncalves.coffee.model.type.OrderStatusType;
+import com.lrgoncalves.mongodb.MongoDBInsert;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import com.mongodb.util.JSON;
 
 @NodeEntity(label= "ORDER")
 public class Order extends NodeIdentifier implements JsonModel {
@@ -255,5 +262,39 @@ public class Order extends NodeIdentifier implements JsonModel {
 
 		return order;
 
+	}
+
+	public static String tracePersist(TraceType type, BusinessOperationType businessOperationType ,final String serviceRequest) {
+
+		MongoDBInsert instance = new MongoDBInsert("order");
+
+		BasicDBObject request = new BasicDBObject();
+
+		request.append("type", type.getValue());
+		request.append("business_operation", businessOperationType.toString());
+
+		Date now = new Date();
+
+		request.append("date", now);
+
+		BasicDBObject payload = new BasicDBObject();
+		payload.append("type", "json");
+
+		DBObject content = null;
+
+		if(type == TraceType.RESPONSE_ERROR) {
+			content = new BasicDBObject();
+			content.put("error", (DBObject) JSON.parse(serviceRequest));
+		}else {
+			content = (DBObject) JSON.parse(serviceRequest);
+		}
+
+		payload.append("content", content);
+
+		request.append("payload", payload);
+
+		DBObject result = instance.insert(request);
+
+		return result.toString();
 	}
 }

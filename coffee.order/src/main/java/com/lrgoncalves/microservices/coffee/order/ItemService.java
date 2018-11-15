@@ -121,9 +121,6 @@ public class ItemService {
 		}
 	}
 	
-	
-	
-	
 	@PATCH
 	@Path("/{ITEM_ID}")
 	@Produces(MediaType.APPLICATION_JSON)

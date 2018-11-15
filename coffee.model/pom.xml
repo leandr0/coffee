@@ -44,10 +44,15 @@
 			<artifactId>joda-time</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>com.lrgoncalves</groupId>
+			<artifactId>mongodb</artifactId>
+		</dependency>
+		
 	</dependencies>
-	
+
 	<build>
 		<finalName>coffee.model</finalName>
 	</build>
-	
+
 </project>

@@ -43,7 +43,7 @@ public class OrderHATEOS extends HATEOS <Order>{
 
 		if(order == null || order.getStatus() == null || order.getStatus().getType() == null) {
 			LOG.warn("Invalid parameter to generate HATEOS");
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Order Not Found");
 		}
 
 		OrderHATEOS instance = new OrderHATEOS();
@@ -92,7 +92,7 @@ public class OrderHATEOS extends HATEOS <Order>{
 			
 			Link update = instance.new Link();
 			LOG.info("Generating update link");
-			cancel.setHeaders(generateHeader("Accept", "application/json"))
+			update.setHeaders(generateHeader("Accept", "application/json"))
 				.setHref(new URI(uri+"order/"+key+"/update"))
 				.setMethod("PATCH")
 				.setRel("update");
